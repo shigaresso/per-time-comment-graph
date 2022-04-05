@@ -20,3 +20,20 @@ Pandas の to_datetime() 関数を用いることで datetime 型になり、こ
 ```py
 df.groupby(pd.Grouper(key='date', freq='1min')).count().reset_index()
 ```
+
+## 問題があった部分
+
+以下のコードを追記すると **Cannot mask with non-boolean array containing NA / NaN values** というエラーが出た 
+
+```py
+# data_frame は Pandas で CSV を読み込んだ変数 message は列名
+print(data_frame[data_frame["message"].str.contains("わこつ")])
+```
+
+これは、message カラムの中に空欄があるのが原因らしく、
+
+```py
+print(data_frame[data_frame["message"].str.contains("わこつ", na=False)])
+```
+
+とすることで、エラーに対応できる。  
