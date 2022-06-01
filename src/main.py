@@ -9,6 +9,11 @@ import config
 
 # python3 main.py ./d1rn4jl998v.csv のようにして使う
 def main():
+    pandas.set_option('display.max_rows', 360)
+    # コメントが流れた時間を保存するテキストファイル
+    with open('comment_time.txt', 'w', encoding='utf-8') as f:
+        f.write(f"『{config.search_word}』 というコメントが流れた時間")
+
     # Pandas で使いやすいデータに変換する
     data_frame = create_data_frame_from_csv()
 
@@ -32,7 +37,8 @@ def search_word_screen_terminal(data_frame, getTime, comment):
     # NaN 部分を削除し、1分毎にまとめる
     print_frame = data_frame.dropna().groupby(pandas.Grouper(key=getTime, freq="1min")).count()
     # コメントの部分が 0 の行は削除する
-    print(print_frame[print_frame[comment] != 0])
+    with open('comment_time.txt', 'a', encoding='utf-8') as f:
+        f.write(f"{print_frame[print_frame[comment] != 0]}")
 
 
 def create_data_frame_from_csv():
@@ -51,8 +57,13 @@ def comment_search(data_frame, comment, search_word):
     
 
 def convert_data_time(data_frame, getTime):
+    # OPENREC 版のフォーマット
     # datetime 型にするためには時間のフォーマットを指定する必要がある
     format = "%Y-%m-%dT%H:%M:%S+09:00"
+
+    # YouTube 版のフォーマット
+    format = "%X"
+
     # 時刻を datetime 型に変換する
     return pandas.to_datetime(data_frame[getTime], format=format)
 
